@@ -29,6 +29,21 @@ fun GuessingGame() {
     var attemptsLeft by remember { mutableStateOf(3) }
     var numberToGuess by remember { mutableStateOf(Random.nextInt(0, 101)) }
     var gameOver by remember { mutableStateOf(false) }
+    var timeLeft by remember { mutableStateOf(60) }
+
+    // Timer: se ejecuta una vez cuando comienza el juego
+    LaunchedEffect(gameOver) {
+        if (!gameOver) {
+            while (timeLeft > 0) {
+                kotlinx.coroutines.delay(1000)
+                timeLeft--
+            }
+            if (!gameOver) {
+                result = "¡Tiempo agotado! El número era $numberToGuess."
+                gameOver = true
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -53,7 +68,15 @@ fun GuessingGame() {
             textAlign = TextAlign.Center
         )
 
-        Spacer(modifier = Modifier.height(36.dp))
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = "Tiempo restante: $timeLeft segundos",
+            fontSize = 18.sp,
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
 
         if (!gameOver) {
             OutlinedTextField(
@@ -112,6 +135,7 @@ fun GuessingGame() {
                 attemptsLeft = 3
                 guess = ""
                 result = ""
+                timeLeft = 60
                 gameOver = false
             }) {
                 Text("Reiniciar juego")
